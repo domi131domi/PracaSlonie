@@ -1,19 +1,30 @@
 #include <iostream>
-#include "Cycle.h"
+#include <fstream>
+#include <vector>
+#include <string>
+#include <windows.h>
 
-const unsigned N = 10;
-unsigned perm[N] = { 8, 4, 7, 2, 0, 3, 6, 5, 9, 1 };
+class Cycle {
+public:
+	std::vector<unsigned> numbers;
+	unsigned long long sumC;
+	unsigned minC;
 
-//unsigned perm[N] = { 4, 9, 3, 5, 1, 7, 6, 2, 0, 8 };
-unsigned m[N] = { 3015,4728,4802,4361,135,4444,4313,1413,4581,546 };
-//short perm[N] = { 1, 3, 0, 2 };
+	Cycle() {};
+	~Cycle() {};
+private:
 
-std::vector<Cycle*> createCycles(unsigned* perm) {
+};
+
+std::vector<Cycle*> createCycles(unsigned* perm, unsigned N) {
 	std::vector<Cycle*> cycles;
-	bool odw[N] = { false };
+	bool* odw = new bool[N];
+	for (unsigned i = 0; i < N; ++i)
+		odw[i] = false;
+
 	int c = -1, x;
 
-	for(int i = 0; i < N; ++i)
+	for(unsigned i = 0; i < N; ++i)
 		if (!odw[i]) {
 			++c;
 			x = i;
@@ -28,7 +39,7 @@ std::vector<Cycle*> createCycles(unsigned* perm) {
 	return cycles;
 }
 
-void calcParameters(std::vector<Cycle*> &cycles, int &min) {
+void calcParameters(std::vector<Cycle*> &cycles, int &min, unsigned* m) {
 	min = -1;
 	for (unsigned i = 0; i < cycles.size(); ++i) {
 		cycles[i]->sumC = 0;
@@ -65,26 +76,38 @@ long long calcResult(std::vector<Cycle*> &cycles, int min) {
 	return result;
 }
 
-
 int main(int argc, char* argv[]) {
+
+
+	unsigned N;
+	std::cin >> N;
+	unsigned* perm = new unsigned[N];
+	unsigned* m = new unsigned[N];
+	unsigned* a = new unsigned[N];
+	unsigned* b = new unsigned[N];
+
+	for (unsigned i = 0; i < N; ++i)
+		std::cin >> m[i];
+	for (unsigned i = 0; i < N; ++i)
+		std::cin >> a[i];
+	for (unsigned i = 0; i < N; ++i)
+		std::cin >> b[i];
+	for (unsigned i = 0; i < N; ++i)
+		perm[b[i]-1] = a[i]-1;
 
 	int min;
 
-	std::vector<Cycle*> cycles = createCycles(perm);
-	calcParameters(cycles, min);
+	std::vector<Cycle*> cycles = createCycles(perm, N);
+	calcParameters(cycles, min, m);
+	long long result = calcResult(cycles, min);
+
+	std::cout << result << std::endl;
 	
 
-	for (Cycle* i : cycles) {
-		for (unsigned e : i->numbers)
-			std::cout << e + 1 << " ";
-		std::cout << std::endl << "Suma " << i->sumC << std::endl;
-		std::cout << "Dlugosc " << i->numbers.size() << std::endl;
-		std::cout << "MinC " << i->minC << std::endl;
-		std::cout << std::endl;
-	}
-		std::cout << "MIN " << min << std::endl;
-		std::cout << "Result: " << calcResult(cycles, min) << std::endl;
+	delete[] perm;
+	delete[] a;
+	delete[] b;
+	delete[] m;
 
-	system("pause");
 	return 0;
 }
